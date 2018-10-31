@@ -15,7 +15,8 @@ io.on("connection", socket => {
     x: 500,
     y: 500,
     playerId: socket.id,
-    team: Math.floor(Math.random() * 2) == 0 ? "imperial" : "caos"
+    direction: "idle",
+    team: Math.floor(Math.random() * 2) === 0 ? "imperial" : "caos"
   };
 
   socket.emit("currentPlayers", players);
@@ -30,8 +31,13 @@ io.on("connection", socket => {
   socket.on("playerMovement", movementData => {
     players[socket.id].x = movementData.x;
     players[socket.id].y = movementData.y;
-    socket.broadcast.emit("playerMoved", players[socket.id]);
   });
+
+  socket.on("playerDirection", directionData => {
+    players[socket.id].direction = directionData;
+    socket.broadcast.emit("playerDirectionChanged", players[socket.id])
+  });
+  
 });
 
 app.get("/", (req, res) => {
